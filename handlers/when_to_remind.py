@@ -1,13 +1,9 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types, Dispatcher
-import db
+import database
 from create_bot import dp
 from datetime import datetime
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-scheduler1 = AsyncIOScheduler()
 
 
 class StateHandler(StatesGroup):
@@ -17,12 +13,12 @@ class StateHandler(StatesGroup):
 
 async def reminder_loading(message: types.Message):
     await message.answer('О чём напомнить?')
-    await StateHandler.reminder1.set()  # установил состояние напоминания
-    db.chat_id = message.chat.id
+    await StateHandler.reminder1.set()
 
 
 async def reminder_times(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
+        data['user_id'] = message.from_user.id
         data['reminder'] = message.text
     await message.answer('Когда напомнить?\n'
                          'Пример: 2022 10 30 16 00')
@@ -31,18 +27,14 @@ async def reminder_times(message: types.Message, state: FSMContext):
 
 async def timer_launch(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['times'] = list(map(int, message.text.split()))
+        data['times'] = message.text
 
+    database.add_remainder([data['user_id'], data['reminder'], data['times']])
     await message.answer('Напоминание создано')
 
-    async def send_message_to_admin(dp: Dispatcher):
-        await dp.bot.send_message(text=data['reminder'], chat_id=5196789047)
+    # async def send_message_to_admin(dp: Dispatcher):
+    #     await dp.bot.send_message(text=data['reminder'], chat_id=5196789047)
 
-    scheduler1.add_job(send_message_to_admin, "date",
-                       run_date=datetime(data['times'][0], data['times'][1], data['times'][2], data['times'][3],
-                                         data['times'][4]), args=(dp,), timezone='Europe/Moscow')
-
-    scheduler1.start()
     await state.finish()
 
 
