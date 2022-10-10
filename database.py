@@ -16,19 +16,19 @@ def read_reminder():
     return cursor.fetchall()
 
 
-# доделать удаление из database
 def del_reminder(value):
-    cursor.execute("DELETE FROM reminders WHERE time='?'", value)
+    cursor.execute("DELETE FROM reminders WHERE id== ?", (value,))
     connection.commit()
 
 
-def read_time():
-    cursor.execute('SELECT time, reminder, user_id FROM reminders')
+def read_from_database():
+    cursor.execute('SELECT time, reminder, user_id, id FROM reminders')
+    connection.commit()
     return cursor.fetchall()
 
 
 if __name__ == '__main__':
-    x = read_reminder()
-    print(x)
-    y = read_time()
+    # x = read_reminder()
+    # print(x)
+    y = read_from_database()
     print(y)

@@ -19,7 +19,7 @@ async def reminder_times(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['user_id'] = message.from_user.id
         data['reminder'] = message.text
-    await message.reply('Через сколько напомнить?')
+    await message.answer('Через сколько напомнить?')
     await StateHandler.next()
 
 
@@ -28,7 +28,7 @@ async def timer_launch(message: types.Message, state: FSMContext):
         data['times'] = message.text
     add_remainder([data['user_id'], data['reminder'], data['times']])
     await message.answer('Напоминание создано')
-    scheduler_bot.fun()
+    await scheduler_bot.adding_reminder_to_scheduler()
     await state.finish()
 
 

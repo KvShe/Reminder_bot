@@ -1,5 +1,4 @@
 from aiogram.utils import executor
-from aiogram import Dispatcher
 from create_bot import dp
 from handlers import start, remind_through, when_to_remind
 import scheduler_bot
@@ -16,4 +15,4 @@ async def on_startup(_):
 
 if __name__ == '__main__':
     scheduler_bot.scheduler.start()
-    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
